@@ -1,7 +1,7 @@
 import { ErrorTarget } from '@webwsdk/types';
 import ErrorStackParser from 'error-stack-parser';
 import { EVENTTYPES, STATUS_CODE } from '@webwsdk/common';
-import { getTimestamp } from '@webwsdk/utils';
+import { getTimestamp, unknownToString } from '@webwsdk/utils';
 
 const HandleEvents = {
   handleError(ev: ErrorTarget): void {
@@ -19,8 +19,21 @@ const HandleEvents = {
         line: lineNumber,
         column: columnNumber
       };
-      console.log('errorData', errorData);
     }
+  },
+  handleUnhandleRejection(ev: PromiseRejectionEvent): void {
+    const stackFrame = ErrorStackParser.parse(ev.reason)[0];
+    const { fileName, columnNumber, lineNumber } = stackFrame;
+    const message = unknownToString(ev.reason.message || ev.reason.stack);
+    const data = {
+      type: EVENTTYPES.UNHANDLEDREJECTION,
+      status: STATUS_CODE.ERROR,
+      time: getTimestamp(),
+      message,
+      fileName,
+      line: lineNumber,
+      column: columnNumber
+    };
   }
 };
 export { HandleEvents };

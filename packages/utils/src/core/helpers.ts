@@ -1,4 +1,5 @@
 import { Callback } from 'packages/types/src';
+import { variableTypeDetection } from './verifyType';
 
 /**
  * 添加事件监听器
@@ -38,4 +39,14 @@ export function validateOption(
   console.error(
     `web-see: ${targetName}期望传入${expectType}类型，目前是${typeofAny(target)}类型`
   );
+}
+
+export function unknownToString(target: unknown): string {
+  if (variableTypeDetection.isString(target)) {
+    return target as string;
+  }
+  if (variableTypeDetection.isUndefined(target)) {
+    return 'undefined';
+  }
+  return JSON.stringify(target);
 }

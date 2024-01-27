@@ -8,6 +8,9 @@ function replace(type: EVENTTYPES): void {
     case EVENTTYPES.ERROR:
       listenError();
       break;
+    case EVENTTYPES.UNHANDLEDREJECTION:
+      unhandledrejectionReplace();
+      break;
     default:
       break;
   }
@@ -19,7 +22,16 @@ export function addReplaceHandler(handler: ReplaceHandler) {
 
 function listenError() {
   on(_global, 'error', function (e: ErrorEvent) {
-    console.log(e);
     notify(EVENTTYPES.ERROR, e);
   });
+}
+function unhandledrejectionReplace(): void {
+  on(
+    _global,
+    EVENTTYPES.UNHANDLEDREJECTION,
+    function (ev: PromiseRejectionEvent) {
+      // ev.preventDefault() 阻止默认行为后，控制台就不会再报红色错误
+      notify(EVENTTYPES.UNHANDLEDREJECTION, ev);
+    }
+  );
 }
