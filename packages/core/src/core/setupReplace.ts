@@ -24,4 +24,11 @@ export function setupReplace(): void {
     },
     type: EVENTTYPES.XHR
   });
+  // 重写fetch
+  addReplaceHandler({
+    callback: (data) => {
+      HandleEvents.handleHttp(data, EVENTTYPES.FETCH);
+    },
+    type: EVENTTYPES.FETCH
+  });
 }

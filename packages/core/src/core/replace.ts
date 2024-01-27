@@ -21,6 +21,9 @@ function replace(type: EVENTTYPES): void {
     case EVENTTYPES.XHR:
       xhrReplace();
       break;
+    case EVENTTYPES.FETCH:
+      fetchReplace();
+      break;
     default:
       break;
   }
@@ -70,7 +73,7 @@ function xhrReplace() {
       on(this, 'loadend', function (this: any) {
         // isSdkTransportUrl 判断当前接口是否为上报的接口
         // isFilterHttpUrl 判断当前接口是否为需要过滤掉的接口
-        if (method === EMethods.Post) return;
+        // if (method === EMethods.Post) return;
         const { responseType, response, status } = this;
         this.webwsdk_xhr.requestData = args[0];
         const eTime = getTimestamp();
@@ -92,6 +95,66 @@ function xhrReplace() {
         notify(EVENTTYPES.XHR, this.webwsdk_xhr);
       });
       originalSend.apply(this, args);
+    };
+  });
+}
+function fetchReplace() {
+  if (!('fetch' in _global)) {
+    return;
+  }
+  replaceAop(_global, EVENTTYPES.FETCH, (originalFetch) => {
+    return function (url: any, config: Partial<Request> = {}): void {
+      const sTime = getTimestamp();
+      const method = (config && config.method) || 'GET';
+      let fetchData = {
+        type: HTTPTYPE.FETCH,
+        method,
+        requestData: config && config.body,
+        url,
+        response: ''
+      };
+      // 获取配置的headers
+      const headers = new Headers(config.headers || {});
+      Object.assign(headers, {
+        setRequestHeader: headers.set
+      });
+      config = Object.assign({}, config, headers);
+      return originalFetch.apply(_global, [url, config]).then(
+        (res: any) => {
+          // 克隆一份，防止被标记已消费
+          const tempRes = res.clone();
+          const eTime = getTimestamp();
+          fetchData = Object.assign({}, fetchData, {
+            elapsedTime: eTime - sTime,
+            Status: tempRes.status,
+            time: sTime
+          });
+          tempRes.text().then((data: any) => {
+            // if (method === EMethods.Post) return;
+            // 用户设置handleHttpStatus函数来判断接口是否正确，只有接口报错时才保留response
+            if (
+              options.handleHttpStatus &&
+              typeof options.handleHttpStatus == 'function'
+            ) {
+              fetchData.response = data;
+            }
+            notify(EVENTTYPES.FETCH, fetchData);
+          });
+          return res;
+        },
+        // 接口报错
+        (err: any) => {
+          const eTime = getTimestamp();
+          if (method === EMethods.Post) return;
+          fetchData = Object.assign({}, fetchData, {
+            elapsedTime: eTime - sTime,
+            status: 0,
+            time: sTime
+          });
+          notify(EVENTTYPES.FETCH, fetchData);
+          throw err;
+        }
+      );
     };
   });
 }
