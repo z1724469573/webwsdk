@@ -10,12 +10,18 @@ export function setupReplace(): void {
     },
     type: EVENTTYPES.ERROR
   });
-
   // 捕获promise的错误
   addReplaceHandler({
     callback: (data) => {
       HandleEvents.handleUnhandleRejection(data);
     },
     type: EVENTTYPES.UNHANDLEDREJECTION
+  });
+  // 重写XMLHTTPRequest
+  addReplaceHandler({
+    callback: (data) => {
+      HandleEvents.handleHttp(data, EVENTTYPES.XHR);
+    },
+    type: EVENTTYPES.XHR
   });
 }

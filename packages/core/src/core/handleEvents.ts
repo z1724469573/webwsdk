@@ -1,7 +1,8 @@
-import { ErrorTarget } from '@webwsdk/types';
+import { ErrorTarget, HttpData } from '@webwsdk/types';
 import ErrorStackParser from 'error-stack-parser';
 import { EVENTTYPES, STATUS_CODE } from '@webwsdk/common';
 import { getTimestamp, unknownToString } from '@webwsdk/utils';
+import { httpTransform } from './transformData';
 
 const HandleEvents = {
   handleError(ev: ErrorTarget): void {
@@ -34,6 +35,11 @@ const HandleEvents = {
       line: lineNumber,
       column: columnNumber
     };
+  },
+  // 处理xhr、fetch回调
+  handleHttp(data: HttpData, type: EVENTTYPES): void {
+    const result = httpTransform(data);
+    console.log(result);
   }
 };
 export { HandleEvents };
