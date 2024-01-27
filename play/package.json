@@ -1,5 +1,5 @@
 {
-  "name": "play",
+  "name": "@webwsdk/play",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,11 +10,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "module",
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.3",
     "vite": "^5.0.12"
   },
   "dependencies": {
-    "@webwsdk/common": "workspace:^1.0.0"
+    "@webwsdk/common": "workspace:^1.0.0",
+    "@webwsdk/core": "workspace:^",
+    "element-plus": "^2.5.3"
   }
 }
