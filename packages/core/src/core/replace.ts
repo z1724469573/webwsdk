@@ -9,6 +9,7 @@ import {
   variableTypeDetection
 } from '@webwsdk/utils';
 import { options } from './options';
+import { transportData } from './reportData';
 
 function replace(type: EVENTTYPES): void {
   switch (type) {
@@ -130,7 +131,12 @@ function fetchReplace() {
             time: sTime
           });
           tempRes.text().then((data: any) => {
-            // if (method === EMethods.Post) return;
+            // 同理，进接口进行过滤
+            if (
+              method === EMethods.Post &&
+              transportData.isSdkTransportUrl(url)
+            )
+              return;
             // 用户设置handleHttpStatus函数来判断接口是否正确，只有接口报错时才保留response
             if (
               options.handleHttpStatus &&

@@ -64,6 +64,15 @@ export class TransportData {
     };
     return info;
   }
+  // 判断请求是否为SDK配置的接口
+  isSdkTransportUrl(targetUrl: string): boolean {
+    let isSdkDsn = false;
+    if (this.errorDsn && targetUrl.indexOf(this.errorDsn) !== -1) {
+      isSdkDsn = true;
+    }
+    return isSdkDsn;
+  }
+
   async send(data: ReportData) {
     const dsn = this.errorDsn;
     if (isEmpty(dsn)) {
