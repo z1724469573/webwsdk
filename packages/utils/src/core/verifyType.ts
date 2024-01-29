@@ -33,3 +33,6 @@ export function isEmpty(wat: any): boolean {
     wat === null
   );
 }
+export function isExistProperty(obj: any, key: any): boolean {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}

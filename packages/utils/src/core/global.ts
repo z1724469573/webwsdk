@@ -15,7 +15,15 @@ export function getGlobalSupport() {
   _global.__webWsdk__ = _global.__webWsdk__ || ({} as WebSee);
   return _global.__webWsdk__;
 }
-
+export function supportsHistory(): boolean {
+  const chrome = _global.chrome;
+  const isChromePackagedApp = chrome && chrome.app && chrome.app.runtime;
+  const hasHistoryApi =
+    'history' in _global &&
+    !!(_global.history as History).pushState &&
+    !!(_global.history as History).replaceState;
+  return !isChromePackagedApp && hasHistoryApi;
+}
 // errorMap 存储代码错误的集合
 _support.errorMap = new Map();
 

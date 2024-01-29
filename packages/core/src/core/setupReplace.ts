@@ -31,4 +31,18 @@ export function setupReplace(): void {
     },
     type: EVENTTYPES.FETCH
   });
+  // 监听history模式路由的变化
+  addReplaceHandler({
+    callback: (data) => {
+      HandleEvents.handleHistory(data);
+    },
+    type: EVENTTYPES.HISTORY
+  });
+  // 监听hashchange
+  addReplaceHandler({
+    callback: (e: HashChangeEvent) => {
+      HandleEvents.handleHashchange(e);
+    },
+    type: EVENTTYPES.HASHCHANGE
+  });
 }

@@ -18,6 +18,7 @@
   "dependencies": {
     "@webwsdk/common": "workspace:^1.0.0",
     "@webwsdk/core": "workspace:^",
-    "element-plus": "^2.5.3"
+    "element-plus": "^2.5.3",
+    "vue-router": "^4.2.5"
   }
 }

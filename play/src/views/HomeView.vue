@@ -1,13 +1,115 @@
 <template>
-  <div class="header">
-    <img class="logo" src="./assets/logo.png" alt="logo" />
-    <span class="title">前端监控 test</span>
+  <div class="home">
+    <el-row>
+      <el-button type="primary" @click="codeErr">js错误</el-button>
+      <el-button type="success" @click="asyncError">异步错误</el-button>
+      <el-button type="danger" @click="promiseErr">promise错误</el-button>
+    </el-row>
+    <el-row>
+      <el-button type="info" @click="xhrError">xhr请求报错</el-button>
+      <el-button type="warning" @click="fetchError">fetch请求报错</el-button>
+    </el-row>
+    <el-row>
+      <el-button type="danger" @click="resourceError">加载资源报错</el-button>
+    </el-row>
+    <p class="error">报错统计</p>
+    <el-table :data="tableData" style="width: 100%">
+      <el-table-column type="index" width="50"></el-table-column>
+      <el-table-column prop="message" label="报错信息" width="300">
+      </el-table-column>
+      <el-table-column prop="pageUrl" label="报错页面"> </el-table-column>
+      <el-table-column prop="time" label="报错时间" width="150">
+        <template v-slot="scope">
+          <span>{{
+            scope.row.time ? format(scope.row.time) : scope.row.date
+          }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="apikey" label="项目编号"> </el-table-column>
+      <el-table-column prop="userId" label="用户id"> </el-table-column>
+      <el-table-column prop="sdkVersion" label="SDK版本"> </el-table-column>
+      <el-table-column prop="deviceInfo" label="浏览器信息">
+        <template v-slot="scope">
+          <span>{{ scope.row.deviceInfo.browser }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="deviceInfo" label="操作系统">
+        <template v-slot="scope">
+          <span>{{ scope.row.deviceInfo.os }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        fixed="right"
+        prop="recordScreenId"
+        label="还原错误代码"
+        width="100"
+      >
+        <template v-slot="scope">
+          <el-button
+            v-if="
+              scope.row.type == 'error' ||
+              scope.row.type == 'unhandledrejection'
+            "
+            type="primary"
+            @click="revertCode(scope.row)"
+            >查看源码</el-button
+          >
+        </template>
+      </el-table-column>
+      <el-table-column
+        fixed="right"
+        prop="recordScreenId"
+        label="播放录屏"
+        width="100"
+      >
+        <template v-slot="scope">
+          <el-button
+            v-if="scope.row.recordScreenId"
+            type="primary"
+            @click="playRecord(scope.row.recordScreenId)"
+            >播放录屏</el-button
+          >
+        </template>
+      </el-table-column>
+      <el-table-column
+        fixed="right"
+        prop="breadcrumb"
+        label="用户行为记录"
+        width="125"
+      >
+        <template v-slot="scope">
+          <el-button
+            v-if="scope.row.breadcrumb"
+            type="primary"
+            @click="revertBehavior(scope.row)"
+            >查看用户行为</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-dialog
+      :title="dialogTitle"
+      :class="{ 'revert-disalog': fullscreen }"
+      top="10vh"
+      :fullscreen="fullscreen"
+      v-model:visible="revertdialog"
+      width="90%"
+      :destroy-on-close="true"
+    >
+      <div id="revert" ref="revert" v-if="dialogTitle != '查看用户行为'"></div>
+      <el-timeline v-else>
+        <el-timeline-item
+          v-for="(activity, index) in activities"
+          :key="index"
+          :icon="activity.icon"
+          :color="activity.color"
+          :timestamp="format(activity.time)"
+        >
+          {{ activity.content }}
+        </el-timeline-item>
+      </el-timeline>
+    </el-dialog>
   </div>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
 </template>
 
 <script>
@@ -181,51 +283,63 @@ export default {
 };
 </script>
 <style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  padding: 0 10px;
+.error {
+  margin-top: 20px;
+  height: 30px;
+  line-height: 30px;
+  font-weight: 800;
+  background-color: #ebeef5;
+}
 
-  .header {
-    width: 100%;
-    padding: 10px 20px;
-    height: 60px;
-    text-align: left;
-    background-color: #ffffff;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    .logo {
-      width: 70px;
-      height: 42px;
-    }
-    .title {
-      margin-left: 10px;
-      font-weight: bold;
-    }
+.el-row {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.el-dialog__header {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.el-timeline {
+  text-align: left;
+
+  .el-timeline-item__icon {
+    font-size: 12px;
   }
 }
 
-nav {
+.revert-disalog {
+  .el-dialog__body {
+    height: 720px;
+  }
+}
+
+.rr-player {
+  margin: 0 auto;
+}
+
+#revert {
+  width: 100%;
+  display: flex;
+}
+
+.errdetail {
+  text-align: left;
+  width: 100%;
+  font-size: 16px;
+}
+
+.code-line {
+  padding: 5px 0;
+}
+
+.heightlight {
+  background-color: yellowgreen;
+}
+
+.errheader {
   padding: 10px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-
-* {
-  margin: 0;
+  border-bottom: 1px solid rgb(214, 210, 210);
 }
 </style>

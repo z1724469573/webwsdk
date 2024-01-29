@@ -3,9 +3,12 @@ import { ReplaceHandler, voidFun } from '@webwsdk/types';
 import { EMethods, EVENTTYPES, HTTPTYPE } from '@webwsdk/common';
 import {
   _global,
+  getLocationHref,
   getTimestamp,
+  isExistProperty,
   on,
   replaceAop,
+  supportsHistory,
   variableTypeDetection
 } from '@webwsdk/utils';
 import { options } from './options';
@@ -24,6 +27,12 @@ function replace(type: EVENTTYPES): void {
       break;
     case EVENTTYPES.FETCH:
       fetchReplace();
+      break;
+    case EVENTTYPES.HISTORY:
+      historyReplace();
+      break;
+    case EVENTTYPES.HASHCHANGE:
+      listenHashchange();
       break;
     default:
       break;
@@ -163,4 +172,48 @@ function fetchReplace() {
       );
     };
   });
+}
+function listenHashchange(): void {
+  // 通过onpopstate事件，来监听hash模式下路由的变化
+  if (isExistProperty(_global, 'onhashchange')) {
+    on(_global, EVENTTYPES.HASHCHANGE, function (e: HashChangeEvent) {
+      notify(EVENTTYPES.HASHCHANGE, e);
+    });
+  }
+}
+// last time route
+let lastHref: string = getLocationHref();
+function historyReplace() {
+  // 是否支持history
+  if (!supportsHistory()) return;
+  const oldOnpopstate = _global.onpopstate;
+  // 添加 onpopState事件
+  _global.onpopstate = function (this: any, ...args: any): void {
+    const to = getLocationHref();
+    const from = lastHref;
+    lastHref = to;
+    notify(EVENTTYPES.HISTORY, {
+      from,
+      to
+    });
+    oldOnpopstate && oldOnpopstate.apply(this, args);
+  };
+  function historyReplaceFn(originalHistoryFn: voidFun): voidFun {
+    return function (this: any, ...args: any[]): void {
+      const url = args.length > 2 ? args[2] : undefined;
+      if (url) {
+        const from = lastHref;
+        const to = String(url);
+        lastHref = to;
+        notify(EVENTTYPES.HISTORY, {
+          from,
+          to
+        });
+      }
+      return originalHistoryFn.apply(this, args);
+    };
+  }
+  // 重写pushState、replaceState事件
+  replaceAop(_global.history, 'pushState', historyReplaceFn);
+  replaceAop(_global.history, 'replaceState', historyReplaceFn);
 }

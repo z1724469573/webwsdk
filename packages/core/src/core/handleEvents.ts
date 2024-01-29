@@ -5,11 +5,13 @@ import {
   getErrorUid,
   getTimestamp,
   hashMapExist,
+  parseUrlToObj,
   unknownToString
 } from '@webwsdk/utils';
 import { httpTransform, resourceTransform } from './transformData';
 import { options } from './options';
 import { transportData } from './reportData';
+import { breadcrumb } from './breadcrumb';
 
 const HandleEvents = {
   handleError(ev: ErrorTarget): void {
@@ -27,6 +29,13 @@ const HandleEvents = {
         line: lineNumber,
         column: columnNumber
       };
+      breadcrumb.push({
+        type: EVENTTYPES.ERROR,
+        category: breadcrumb.getCategory(EVENTTYPES.ERROR),
+        data: errorData,
+        time: getTimestamp(),
+        status: STATUS_CODE.ERROR
+      });
       const hash: string = getErrorUid(
         `${EVENTTYPES.ERROR}-${ev.message}-${fileName}-${columnNumber}`
       );
@@ -42,7 +51,19 @@ const HandleEvents = {
     if (target?.localName) {
       // 提取资源加载的信息
       const data = resourceTransform(target);
+      breadcrumb.push({
+        type: EVENTTYPES.RESOURCE,
+        category: breadcrumb.getCategory(EVENTTYPES.RESOURCE),
+        status: STATUS_CODE.ERROR,
+        time: getTimestamp(),
+        data
+      });
       console.log('资源加载出错', data);
+      return transportData.send({
+        ...data,
+        type: EVENTTYPES.RESOURCE,
+        status: STATUS_CODE.ERROR
+      });
     }
   },
   handleUnhandleRejection(ev: PromiseRejectionEvent): void {
@@ -61,6 +82,13 @@ const HandleEvents = {
     const hash: string = getErrorUid(
       `${EVENTTYPES.UNHANDLEDREJECTION}-${message}-${fileName}-${columnNumber}`
     );
+    breadcrumb.push({
+      type: EVENTTYPES.UNHANDLEDREJECTION,
+      category: breadcrumb.getCategory(EVENTTYPES.UNHANDLEDREJECTION),
+      time: getTimestamp(),
+      status: STATUS_CODE.ERROR,
+      data
+    });
     // 开启repeatCodeError第一次报错才上报
     if (
       !options.repeatCodeError ||
@@ -72,10 +100,52 @@ const HandleEvents = {
   // 处理xhr、fetch回调
   handleHttp(data: HttpData, type: EVENTTYPES): void {
     const result = httpTransform(data);
+    // 添加用户行为，去掉自身上报的接口行为
+    if (!data.url.includes(options.dsn)) {
+      breadcrumb.push({
+        type,
+        category: breadcrumb.getCategory(type),
+        data: result,
+        status: result.status,
+        time: data.time
+      });
+    }
     if (result.status === 'error') {
       // 上报接口错误
       transportData.send({ ...result, type, status: STATUS_CODE.ERROR });
     }
+  },
+  // history重写
+  handleHistory(data: any) {
+    const { from, to } = data;
+    // 定义parsedFrom变量，值为relative
+    const { relative: parsedFrom } = parseUrlToObj(from);
+    const { relative: parsedTo } = parseUrlToObj(to);
+    breadcrumb.push({
+      type: EVENTTYPES.HISTORY,
+      category: breadcrumb.getCategory(EVENTTYPES.HISTORY),
+      data: {
+        from: parsedFrom ? parsedFrom : '/',
+        to: parsedTo ? parsedTo : '/'
+      },
+      time: getTimestamp(),
+      status: STATUS_CODE.OK
+    });
+  },
+  handleHashchange(data: HashChangeEvent): void {
+    const { oldURL, newURL } = data;
+    const { relative: from } = parseUrlToObj(oldURL);
+    const { relative: to } = parseUrlToObj(newURL);
+    breadcrumb.push({
+      type: EVENTTYPES.HASHCHANGE,
+      category: breadcrumb.getCategory(EVENTTYPES.HASHCHANGE),
+      data: {
+        from,
+        to
+      },
+      time: getTimestamp(),
+      status: STATUS_CODE.OK
+    });
   }
 };
 export { HandleEvents };

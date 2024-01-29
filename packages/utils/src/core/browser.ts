@@ -1,6 +1,35 @@
 import { EVENTTYPES } from '@webwsdk/common';
 import { _support, setFlag } from './global';
 
+/**
+ * 将地址字符串转换成对象，
+ * 输入：'https://github.com/z1724469573/webwsdk?token=123&name=11'
+ * 输出：{
+ *  "host": "github.com",
+ *  "path": "/z1724469573/webwsdk",
+ *  "protocol": "https",
+ *  "relative": "/z1724469573/webwsdk?token=123&name=11"
+ * }
+ */
+export function parseUrlToObj(url: string) {
+  if (!url) {
+    return {};
+  }
+  const match = url.match(
+    /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/
+  );
+  if (!match) {
+    return {};
+  }
+  const query = match[6] || '';
+  const fragment = match[8] || '';
+  return {
+    host: match[4],
+    path: match[5],
+    protocol: match[2],
+    relative: match[5] + query + fragment
+  };
+}
 export function setSilentFlag({
   silentXhr = true,
   silentFetch = true,
