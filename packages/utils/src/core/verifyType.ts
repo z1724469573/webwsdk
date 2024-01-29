@@ -20,3 +20,16 @@ export const variableTypeDetection = {
   isProcess: isType('process'),
   isWindow: isType('Window')
 };
+/**
+ * 检查是否是空对象
+ */
+export function isEmptyObject(obj: object): boolean {
+  return variableTypeDetection.isObject(obj) && Object.keys(obj).length === 0;
+}
+export function isEmpty(wat: any): boolean {
+  return (
+    (variableTypeDetection.isString(wat) && wat.trim() === '') ||
+    wat === undefined ||
+    wat === null
+  );
+}

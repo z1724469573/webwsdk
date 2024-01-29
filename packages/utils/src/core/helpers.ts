@@ -1,6 +1,10 @@
 import { Callback, IAnyObject } from '@webwsdk/types';
 import { variableTypeDetection } from './verifyType';
 
+export function getLocationHref(): string {
+  if (typeof document === 'undefined' || document.location == null) return '';
+  return document.location.href;
+}
 /**
  * 添加事件监听器
  * ../export
@@ -64,6 +68,18 @@ export function validateOption(
   );
 }
 
+export function generateUUID(): string {
+  let d = new Date().getTime();
+  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+    /[xy]/g,
+    function (c) {
+      const r = (d + Math.random() * 16) % 16 | 0;
+      d = Math.floor(d / 16);
+      return (c == 'x' ? r : (r & 0x3) | 0x8).toString(16);
+    }
+  );
+  return uuid;
+}
 export function unknownToString(target: unknown): string {
   if (variableTypeDetection.isString(target)) {
     return target as string;

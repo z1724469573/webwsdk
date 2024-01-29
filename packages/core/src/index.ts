@@ -1,5 +1,6 @@
 import { InitOptions, VueInstance, ViewModel } from '@webwsdk//types';
-import { HandleEvents, setupReplace } from './core';
+import { HandleEvents, handleOptions, setupReplace } from './core';
+import { _global } from '@webwsdk/utils';
 
 function init(options: InitOptions) {
   if (!options.dsn || !options.apikey) {
@@ -7,9 +8,9 @@ function init(options: InitOptions) {
       `web-see 缺少必须配置项：${!options.dsn ? 'dsn' : 'apikey'} `
     );
   }
-  // if (!('fetch' in _global) || options.disabled) return;
+  if (!('fetch' in _global) || options.disabled) return;
   // 初始化配置
-  // handleOptions(options);
+  handleOptions(options);
   setupReplace();
 }
 

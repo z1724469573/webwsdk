@@ -1,5 +1,9 @@
 import { WebSee, Window } from '@webwsdk/types';
+import { variableTypeDetection } from './verifyType';
 
+export const isBrowserEnv = variableTypeDetection.isWindow(
+  typeof window !== 'undefined' ? window : 0
+);
 export function getGlobal(): Window {
   return window as unknown as Window;
 }
@@ -11,6 +15,9 @@ export function getGlobalSupport() {
   _global.__webWsdk__ = _global.__webWsdk__ || ({} as WebSee);
   return _global.__webWsdk__;
 }
+
+// errorMap 存储代码错误的集合
+_support.errorMap = new Map();
 
 _support.hasError = false;
 
