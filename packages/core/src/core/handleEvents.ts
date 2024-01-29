@@ -2,7 +2,7 @@ import { ErrorTarget, HttpData } from '@webwsdk/types';
 import ErrorStackParser from 'error-stack-parser';
 import { EVENTTYPES, STATUS_CODE } from '@webwsdk/common';
 import { getTimestamp, unknownToString } from '@webwsdk/utils';
-import { httpTransform } from './transformData';
+import { httpTransform, resourceTransform } from './transformData';
 
 const HandleEvents = {
   handleError(ev: ErrorTarget): void {
@@ -20,6 +20,12 @@ const HandleEvents = {
         line: lineNumber,
         column: columnNumber
       };
+    }
+    // 资源加载报错
+    if (target?.localName) {
+      // 提取资源加载的信息
+      const data = resourceTransform(target);
+      console.log('资源加载出错', data);
     }
   },
   handleUnhandleRejection(ev: PromiseRejectionEvent): void {
@@ -39,7 +45,7 @@ const HandleEvents = {
   // 处理xhr、fetch回调
   handleHttp(data: HttpData, type: EVENTTYPES): void {
     const result = httpTransform(data);
-    console.log(result);
+    console.log('fetch/xhr报错', result);
   }
 };
 export { HandleEvents };

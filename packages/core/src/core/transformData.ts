@@ -1,7 +1,7 @@
 import { options } from './options';
-import { fromHttpStatus } from '@webwsdk/utils';
+import { fromHttpStatus, getTimestamp, interceptStr } from '@webwsdk/utils';
 import { HTTP_CODE, STATUS_CODE } from '@webwsdk/common';
-import { HttpData } from '@webwsdk/types';
+import { HttpData, ResouceError, ResourceTarget } from '@webwsdk/types';
 // 处理接口的状态
 export function httpTransform(data: HttpData): HttpData {
   let message: any = '';
@@ -56,5 +56,14 @@ export function httpTransform(data: HttpData): HttpData {
       Status,
       data: status == STATUS_CODE.ERROR ? response : null
     }
+  };
+}
+export function resourceTransform(target: ResourceTarget): ResouceError {
+  return {
+    time: getTimestamp(),
+    message:
+      (interceptStr(target.src as string, 120) ||
+        interceptStr(target.href as string, 120)) + '; 资源加载失败',
+    name: target.localName as string
   };
 }

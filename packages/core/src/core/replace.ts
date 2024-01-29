@@ -68,7 +68,7 @@ function xhrReplace() {
   });
   replaceAop(originalXhrProto, 'send', (originalSend: voidFun) => {
     return function (this: any, ...args: any[]): void {
-      const { method, url } = this.webwsdk_xhr;
+      // const { method, url } = this.webwsdk_xhr;
       // 监听loadend事件，接口成功或失败都会执行
       on(this, 'loadend', function (this: any) {
         // isSdkTransportUrl 判断当前接口是否为上报的接口

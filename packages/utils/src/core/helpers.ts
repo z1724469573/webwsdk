@@ -73,3 +73,12 @@ export function unknownToString(target: unknown): string {
   }
   return JSON.stringify(target);
 }
+export function interceptStr(str: string, interceptLength: number): string {
+  if (variableTypeDetection.isString(str)) {
+    return (
+      str.slice(0, interceptLength) +
+      (str.length > interceptLength ? `:截取前${interceptLength}个字符` : '')
+    );
+  }
+  return '';
+}
