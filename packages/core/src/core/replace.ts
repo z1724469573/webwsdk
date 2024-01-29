@@ -9,6 +9,7 @@ import {
   on,
   replaceAop,
   supportsHistory,
+  throttle,
   variableTypeDetection
 } from '@webwsdk/utils';
 import { options } from './options';
@@ -33,6 +34,9 @@ function replace(type: EVENTTYPES): void {
       break;
     case EVENTTYPES.HASHCHANGE:
       listenHashchange();
+      break;
+    case EVENTTYPES.CLICK:
+      domReplace();
       break;
     default:
       break;
@@ -216,4 +220,20 @@ function historyReplace() {
   // 重写pushState、replaceState事件
   replaceAop(_global.history, 'pushState', historyReplaceFn);
   replaceAop(_global.history, 'replaceState', historyReplaceFn);
+}
+function domReplace(): void {
+  if (!('document' in _global)) return;
+  // 节流，默认0s
+  const clickThrottle = throttle(notify, options.throttleDelayTime);
+  on(
+    _global.document,
+    'click',
+    function (this: any): void {
+      clickThrottle(EVENTTYPES.CLICK, {
+        category: 'click',
+        data: this
+      });
+    },
+    true
+  );
 }

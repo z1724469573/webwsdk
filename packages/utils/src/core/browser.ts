@@ -2,6 +2,22 @@ import { EVENTTYPES } from '@webwsdk/common';
 import { _support, setFlag } from './global';
 
 /**
+ * 返回包含id、class、innerTextde字符串的标签
+ * @param target html节点
+ */
+export function htmlElementAsString(target: HTMLElement): string {
+  const tagName = target.tagName.toLowerCase();
+  if (tagName === 'body') {
+    return '';
+  }
+  let classNames = target.classList.value;
+
+  classNames = classNames !== '' ? ` class='${classNames}'` : '';
+  const id = target.id ? ` id="${target.id}"` : '';
+  const innerText = target.innerText;
+  return `<${tagName}${id}${classNames !== '' ? classNames : ''}>${innerText}</${tagName}>`;
+}
+/**
  * 将地址字符串转换成对象，
  * 输入：'https://github.com/z1724469573/webwsdk?token=123&name=11'
  * 输出：{

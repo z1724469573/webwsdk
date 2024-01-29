@@ -5,6 +5,7 @@ import {
   getErrorUid,
   getTimestamp,
   hashMapExist,
+  htmlElementAsString,
   parseUrlToObj,
   unknownToString
 } from '@webwsdk/utils';
@@ -146,6 +147,21 @@ const HandleEvents = {
       time: getTimestamp(),
       status: STATUS_CODE.OK
     });
+  },
+  // 处理click回调
+  handleClick(data: any) {
+    const htmlString = htmlElementAsString(
+      data.data.activeElement as HTMLElement
+    );
+    if (htmlString) {
+      breadcrumb.push({
+        type: EVENTTYPES.CLICK,
+        status: STATUS_CODE.OK,
+        category: breadcrumb.getCategory(EVENTTYPES.CLICK),
+        data: htmlString,
+        time: getTimestamp()
+      });
+    }
   }
 };
 export { HandleEvents };

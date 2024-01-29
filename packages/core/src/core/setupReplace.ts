@@ -45,4 +45,11 @@ export function setupReplace(): void {
     },
     type: EVENTTYPES.HASHCHANGE
   });
+  // 监听click事件
+  addReplaceHandler({
+    callback: (data) => {
+      HandleEvents.handleClick(data);
+    },
+    type: EVENTTYPES.CLICK
+  });
 }

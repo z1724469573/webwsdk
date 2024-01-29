@@ -98,3 +98,20 @@ export function interceptStr(str: string, interceptLength: number): string {
   }
   return '';
 }
+/**
+ * 函数节流
+ * fn 需要节流的函数
+ * delay 节流的时间间隔
+ * 返回一个包含节流功能的函数
+ */
+export const throttle = (fn: any, delay: number) => {
+  let canRun = true;
+  return function (this: any, ...args: any[]) {
+    if (!canRun) return;
+    fn.apply(this, args);
+    canRun = false;
+    setTimeout(() => {
+      canRun = true;
+    }, delay);
+  };
+};
