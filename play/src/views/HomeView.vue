@@ -28,22 +28,17 @@
       <el-table-column prop="apikey" label="项目编号"> </el-table-column>
       <el-table-column prop="userId" label="用户id"> </el-table-column>
       <el-table-column prop="sdkVersion" label="SDK版本"> </el-table-column>
-      <el-table-column prop="deviceInfo" label="浏览器信息">
+      <!-- <el-table-column prop="deviceInfo" label="浏览器信息">
         <template v-slot="scope">
           <span>{{ scope.row.deviceInfo.browser }}</span>
         </template>
-      </el-table-column>
-      <el-table-column prop="deviceInfo" label="操作系统">
+      </el-table-column> -->
+      <!-- <el-table-column prop="deviceInfo" label="操作系统">
         <template v-slot="scope">
           <span>{{ scope.row.deviceInfo.os }}</span>
         </template>
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        prop="recordScreenId"
-        label="还原错误代码"
-        width="100"
-      >
+      </el-table-column> -->
+      <el-table-column fixed="right" label="还原错误代码" width="100">
         <template v-slot="scope">
           <el-button
             v-if="
@@ -56,7 +51,7 @@
           >
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         fixed="right"
         prop="recordScreenId"
         label="播放录屏"
@@ -70,7 +65,7 @@
             >播放录屏</el-button
           >
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         fixed="right"
         prop="breadcrumb"
@@ -92,9 +87,10 @@
       :class="{ 'revert-disalog': fullscreen }"
       top="10vh"
       :fullscreen="fullscreen"
-      v-model:visible="revertdialog"
+      v-model="revertdialog"
       width="90%"
       :destroy-on-close="true"
+      ref="b"
     >
       <div id="revert" ref="revert" v-if="dialogTitle != '查看用户行为'"></div>
       <el-timeline v-else>
@@ -113,7 +109,7 @@
 </template>
 
 <script>
-// import { findCodeBySourceMap } from '../utils/sourcemap';
+import { findCodeBySourceMap } from '../utils/sourcemap';
 // import { unzip } from '../utils/recordScreen.js';
 // import rrwebPlayer from 'rrweb-player';
 // import 'rrweb-player/dist/style.css';
@@ -188,6 +184,7 @@ export default {
         this.fullscreen = false;
         this.revertdialog = true;
         this.$nextTick(() => {
+          console.log('====asdas', this.$refs, this.$refs.b);
           this.$refs.revert.innerHTML = res;
         });
       });

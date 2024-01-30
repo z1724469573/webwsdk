@@ -5,20 +5,27 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "vite"
+    "dev": "vite",
+    "service": "nodemon ./server.js",
+    "start": "concurrently  \"pnpm run dev\" \"pnpm run service\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.3",
+    "body-parser": "^1.20.2",
+    "co-body": "^6.1.0",
+    "nodemon": "^3.0.3",
     "vite": "^5.0.12"
   },
   "dependencies": {
     "@webwsdk/common": "workspace:^1.0.0",
     "@webwsdk/core": "workspace:^",
+    "concurrently": "^8.2.2",
     "element-plus": "^2.5.3",
+    "express": "^4.18.2",
+    "source-map-js": "^1.0.2",
     "vue-router": "^4.2.5"
   }
 }

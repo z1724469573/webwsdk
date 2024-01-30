@@ -10,7 +10,7 @@ app.use(router);
 app.use(ElementPlus);
 app.mount('#app');
 app.use(webSdk, {
-  dsn: 'http://localhost:8080/reportData',
+  dsn: 'http://localhost:8083/reportData',
   apikey: 'abcd',
   handleHttpStatus(data) {
     // console.log('data', data);
