@@ -11,7 +11,7 @@
 </template>
 
 <script>
-// import { findCodeBySourceMap } from '../utils/sourcemap';
+import { findCodeBySourceMap } from './src/utils/sourcemap';
 // import { unzip } from '../utils/recordScreen.js';
 // import rrwebPlayer from 'rrweb-player';
 // import 'rrweb-player/dist/style.css';
@@ -90,37 +90,37 @@ export default {
         });
       });
     },
-    playRecord(id) {
-      fetch(`http://localhost:8083/getRecordScreenId?id=${id}`)
-        .then((response) => response.json())
-        .then((res) => {
-          let { code, data } = res;
-          if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
-            let events = unzip(data[0].events);
-            this.fullscreen = true;
-            this.dialogTitle = '播放录屏';
-            this.revertdialog = true;
-            this.$nextTick(() => {
-              new rrwebPlayer(
-                {
-                  target: document.getElementById('revert'),
-                  data: {
-                    events
-                  }
-                },
-                {
-                  UNSAFE_replayCanvas: true
-                }
-              );
-            });
-          } else {
-            this.$message({
-              message: '暂无数据，请稍后重试~',
-              type: 'warning'
-            });
-          }
-        });
-    },
+    // playRecord(id) {
+    //   fetch(`http://localhost:8083/getRecordScreenId?id=${id}`)
+    //     .then((response) => response.json())
+    //     .then((res) => {
+    //       let { code, data } = res;
+    //       if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
+    //         let events = unzip(data[0].events);
+    //         this.fullscreen = true;
+    //         this.dialogTitle = '播放录屏';
+    //         this.revertdialog = true;
+    //         this.$nextTick(() => {
+    //           new rrwebPlayer(
+    //             {
+    //               target: document.getElementById('revert'),
+    //               data: {
+    //                 events
+    //               }
+    //             },
+    //             {
+    //               UNSAFE_replayCanvas: true
+    //             }
+    //           );
+    //         });
+    //       } else {
+    //         this.$message({
+    //           message: '暂无数据，请稍后重试~',
+    //           type: 'warning'
+    //         });
+    //       }
+    //     });
+    // },
     format(time) {
       let str = new Date(time);
       return (

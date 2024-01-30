@@ -1,6 +1,14 @@
 import { InitOptions, VueInstance, ViewModel } from '@webwsdk//types';
-import { HandleEvents, handleOptions, setupReplace } from './core';
-import { _global } from '@webwsdk/utils';
+import {
+  HandleEvents,
+  breadcrumb,
+  handleOptions,
+  notify,
+  setupReplace,
+  subscribeEvent,
+  transportData
+} from './core';
+import { _global, nativeTryCatch } from '@webwsdk/utils';
 
 function init(options: InitOptions) {
   if (!options.dsn || !options.apikey) {
@@ -31,4 +39,19 @@ function install(Vue: VueInstance, options: InitOptions) {
   init(options);
 }
 
-export default { install, init };
+function use(plugins: any, options?: any) {
+  const instance = new plugins(options);
+  if (
+    !subscribeEvent({
+      callback: (data) => {
+        instance.transform(data);
+      },
+      type: instance.type
+    })
+  )
+    return;
+  nativeTryCatch(() => {
+    instance.core({ transportData, breadcrumb, options, notify });
+  });
+}
+export default { install, init, use };

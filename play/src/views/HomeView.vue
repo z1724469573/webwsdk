@@ -184,7 +184,6 @@ export default {
         this.fullscreen = false;
         this.revertdialog = true;
         this.$nextTick(() => {
-          console.log('====asdas', this.$refs, this.$refs.b);
           this.$refs.revert.innerHTML = res;
         });
       });

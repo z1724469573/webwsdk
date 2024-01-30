@@ -2,9 +2,9 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import ElementPlus from 'element-plus';
 import 'element-plus/theme-chalk/index.css';
-import webSdk from '@webwsdk/core';
 import router from './src/router';
-
+import webSdk from '@webwsdk/core';
+import performance from '@webwsdk/performance';
 const app = createApp(App);
 app.use(router);
 app.use(ElementPlus);
@@ -25,3 +25,4 @@ app.use(webSdk, {
     }
   }
 });
+webSdk.use(performance);

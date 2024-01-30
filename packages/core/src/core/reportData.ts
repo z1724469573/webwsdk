@@ -8,6 +8,7 @@ import {
   validateOption
 } from '@webwsdk/utils';
 import { InitOptions, ReportData } from '@webwsdk/types';
+import { breadcrumb } from './breadcrumb';
 /**
  * 用来上报数据，包含图片打点上报、xhr请求
  */
@@ -56,11 +57,13 @@ export class TransportData {
     };
     this.queue.addFn(requestFun);
   }
+  // 添加公共信息
   getTransportData(data: any): ReportData {
     const info = {
       ...data,
       uuid: this.uuid,
-      pageUrl: getLocationHref()
+      pageUrl: getLocationHref(),
+      breadcrumb: breadcrumb.getStack()
     };
     return info;
   }

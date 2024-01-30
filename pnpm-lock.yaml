@@ -86,6 +86,21 @@ importers:
 
   packages/core/dist: {}
 
+  packages/performance:
+    dependencies:
+      '@webwsdk/common':
+        specifier: workspace:^
+        version: link:../common
+      '@webwsdk/types':
+        specifier: workspace:^
+        version: link:../types
+      '@webwsdk/utils':
+        specifier: workspace:^
+        version: link:../utils
+      web-vitals:
+        specifier: ^3.5.2
+        version: 3.5.2
+
   packages/types:
     dependencies:
       '@webwsdk/common':
@@ -118,6 +133,9 @@ importers:
       '@webwsdk/core':
         specifier: workspace:^
         version: link:../packages/core
+      '@webwsdk/performance':
+        specifier: workspace:^
+        version: link:../packages/performance
       concurrently:
         specifier: ^8.2.2
         version: 8.2.2
@@ -4183,6 +4201,10 @@ packages:
     dependencies:
       defaults: 1.0.4
     dev: true
+
+  /web-vitals@3.5.2:
+    resolution: {integrity: sha512-c0rhqNcHXRkY/ogGDJQxZ9Im9D19hDihbzSQJrsioex+KnFgmMzBiy57Z1EjkhX/+OjyBpclDCzz2ITtjokFmg==}
+    dev: false
 
   /which-boxed-primitive@1.0.2:
     resolution: {integrity: sha512-bwZdv0AKLpplFY2KZRX6TvyuN7ojjr7lwkg6ml0roIy9YeuSr7JS372qlNW18UQYzgYK9ziGcerWqZOmEn9VNg==}
